@@ -7,8 +7,10 @@ public class NoSql{
     memtable.Add("one","one1");
     memtable.Add("two","two1");
     memtable.Print(); 
-    memtable.Remove("one");
     memtable.Add("one","one2");
     memtable.Print();
+    if(memtable.TryGet("one", out string val)){
+      Console.WriteLine(val);
+    }
   }
 }

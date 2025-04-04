@@ -1,6 +1,6 @@
 namespace Utils ;
 
-internal class SkipList{
+internal class SkipList : IOrderedList{
   private int maxLevel;
   Node head;
   private static readonly Random rand = new Random();
