@@ -1,12 +1,17 @@
+using System.Text;
+
 namespace Utils ;
 
 internal class SkipList : IOrderedList{
   private int maxLevel;
   Node head;
   private static readonly Random rand = new Random();
+  private long size;
+  private readonly int maxSize;
 
-  public SkipList(int maxLevel){
+  public SkipList(int maxLevel, int maxSize){
     this.maxLevel = maxLevel;
+    this.maxSize = maxSize;
     head = new Node(-1, "HEAD", maxLevel-1);
   }
   public void Insert(int key, string val){
@@ -19,20 +24,26 @@ internal class SkipList : IOrderedList{
         newNode.Forward[i] = update[i].Forward[i];
         update[i].Forward[i] = newNode;
       }
+      size += EstimateSize(node);
     }
     else{
+      size += EstimateSizeOfString(val) - EstimateSizeOfString(node.Forward[0].Val);
       node.Forward[0].Val = val;
+      node.Forward[0].IsDelete = false;
     }
   }
+
+  //the delete should be soft delete. Append over update 
   public void Delete(int key){
     Node node = Search(key, out List<Node> update);
     node = node.Forward[0];
     if(node.key == key){
-      for(int i = 0; i < update.Count ; i++){
-        if(update[i].Forward[i]?.key == key){
-        update[i].Forward[i] = node.Forward[i];
-        }
-      }
+      node.IsDelete = true;
+      //for(int i = 0; i < update.Count ; i++){
+      //  if(update[i].Forward[i]?.key == key){
+      //  update[i].Forward[i] = node.Forward[i];
+      //  }
+      //}
     }
   }
   public void Print(){
@@ -49,16 +60,33 @@ internal class SkipList : IOrderedList{
     Console.WriteLine();
   }
 
+  public List<(int Key,string Val)> GetAllData(){
+    int level = 0;
+    List<(int Key, string Val)> data = [];
+    var node = head.Forward[level];
+    while(node!=null){
+      var temp = (Key: node.key, Val: node.Val);
+      data.Add(temp);
+      node = node.Forward[level];
+    }
+    return data;
+  }
+
   public bool TrySearch(int key, out string val){
     Node node = Search(key, out List<Node> _);
     node = node.Forward[0];
-    if(node.key == key){
+    if(node.key == key && !node.IsDelete){
       val = node.Val;
       return true;
     }
     val = null;
     return false;
   }
+
+  public bool IsFull(){
+    return size >= maxSize;
+  }
+
   private Node Search(int key, out List<Node> update){
     update = Enumerable.Repeat<Node>(null,maxLevel).ToList();
     var node = head;
@@ -73,6 +101,18 @@ internal class SkipList : IOrderedList{
   private int GenerateRandomLevel(){
     return rand.Next(maxLevel);
   }
+
+  //the size is a very very vague estimate
+  private static int EstimateSize(Node node){
+    int size = 0;
+    size += EstimateSizeOfString(node.Val); //for Val
+    size += 40; // default size for node
+    size += 8 * node.Val.Length;
+    return size;
+  }
+  private static int EstimateSizeOfString(string s){
+    return Encoding.Unicode.GetByteCount(s);
+  }
 }
 
 
@@ -83,6 +123,7 @@ internal class Node{
   public List<Node> Forward {get; set;}
   public int CurrentLevel {get; set;}
   private readonly int level;
+  public bool IsDelete {get;set;}
 
   public Node(int key, string val, int level){
     this.key = key;
@@ -90,6 +131,7 @@ internal class Node{
     this.level = level;
     CurrentLevel = level;
     Forward = Enumerable.Repeat<Node>(null,level+1).ToList();
+    IsDelete = false;
   }
 
   public void Reset(){

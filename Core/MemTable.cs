@@ -1,5 +1,3 @@
-using System.Net;
-using Utils.RBTree;
 using Utils;
 namespace Core;
 
@@ -7,7 +5,7 @@ public class Memtable{
   private readonly IOrderedList _list;
   private readonly IHash _hash;
   public Memtable(IHash hash){
-    _list = new RBTree();
+    _list = new SkipList(5, 500);
     _hash = hash;
   }
   public void Add(string key, string val){
@@ -27,6 +25,9 @@ public class Memtable{
 
   public void Print(){
     _list.Print();
+  }
+  public List<(int Key, string Val)> GetAllData(){
+    return _list.GetAllData();
   }
 }
 

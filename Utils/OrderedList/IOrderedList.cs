@@ -5,4 +5,5 @@ public interface IOrderedList{
   public void Delete(int key);
   public void Print();
   public bool TrySearch(int key, out string val);
+  public List<(int Key, string Val)> GetAllData();
 }
