@@ -51,7 +51,7 @@ internal class SkipList : IOrderedList{
     while(level >= 0){
       var node = head.Forward[level];
       while(node != null){
-        Console.Write($"{node.key} -> {node.Val} :: ");
+        Console.Write($"{node.key} -> {node.Val}{(node.IsDelete?"#SoftDelete#":"")} :: ");
         node = node.Forward[level];
       }
       Console.WriteLine();
@@ -75,7 +75,7 @@ internal class SkipList : IOrderedList{
   public bool TrySearch(int key, out string val){
     Node node = Search(key, out List<Node> _);
     node = node.Forward[0];
-    if(node.key == key && !node.IsDelete){
+    if(node is not null && node.key == key && !node.IsDelete){
       val = node.Val;
       return true;
     }
