@@ -1,4 +1,5 @@
 using System.Text;
+using Core;
 
 namespace Utils ;
 
@@ -60,12 +61,12 @@ internal class SkipList : IOrderedList{
     Console.WriteLine();
   }
 
-  public List<(int Key,string Val)> GetAllData(){
+  public List<StoredData> GetAllData(){
     int level = 0;
-    List<(int Key, string Val)> data = [];
+    List<StoredData> data = [];
     var node = head.Forward[level];
     while(node!=null){
-      var temp = (Key: node.key, Val: node.Val);
+      var temp = new StoredData{Key = node.key, Val = node.Val, IsDelete = node.IsDelete}; 
       data.Add(temp);
       node = node.Forward[level];
     }

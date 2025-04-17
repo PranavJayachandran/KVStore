@@ -42,7 +42,7 @@ public class Memtable{
     _list.Print();
   }
 
-  public List<(int Key, string Val)> GetAllData(){
+  public List<StoredData> GetAllData(){
     return _list.GetAllData();
   }
 

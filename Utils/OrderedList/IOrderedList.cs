@@ -1,3 +1,4 @@
+using Core;
 namespace Utils;
 
 public interface IOrderedList{
@@ -5,5 +6,5 @@ public interface IOrderedList{
   public void Delete(int key);
   public void Print();
   public bool TrySearch(int key, out string val);
-  public List<(int Key, string Val)> GetAllData();
+  public List<StoredData> GetAllData();
 }
