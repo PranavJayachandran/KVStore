@@ -6,6 +6,6 @@ public class StoredData : IComparable<StoredData>{
   public bool IsDelete {get; init;}
 
   public int CompareTo(StoredData sd){
-    return Key.CompareTo(sd.Key);
+    return sd.Key.CompareTo(Key);
   }
 }
