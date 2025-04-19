@@ -15,11 +15,12 @@ public class Memtable{
     }
   }
 
-  public void Add(string key, string val, bool isRecovery = false){
-    _list.Insert(_hash.GetHash(key),val);
+  public void Add(string key, string val, bool IsDelete = false, bool isRecovery = false){
+    _list.Insert(_hash.GetHash(key),val, IsDelete);
     if (!isRecovery){
       WriteLog(LogType.Insert, [key,val]);
     }
+    Print();
   }
 
   public bool TryGet(string key, out string val){
@@ -44,6 +45,14 @@ public class Memtable{
 
   public List<StoredData> GetAllData(){
     return _list.GetAllData();
+  }
+
+  public bool IsFull(){
+    return _list.IsFull();
+  }
+
+  public void CleanWAL(){
+    _wal.CleanLogFile();
   }
 
   private void WriteLog(LogType type, List<string> val){

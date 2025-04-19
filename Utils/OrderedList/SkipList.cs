@@ -15,12 +15,12 @@ internal class SkipList : IOrderedList{
     this.maxSize = maxSize;
     head = new Node(-1, "HEAD", maxLevel-1);
   }
-  public void Insert(int key, string val){
+  public void Insert(int key, string val, bool IsDelete = false){
     List<Node>update = null; 
     Node node = Search(key,out update);
     if(node.Forward[0]?.key != key){
       int level = GenerateRandomLevel();
-      Node newNode = new Node(key,val,level);
+      Node newNode = new Node(key,val,level,IsDelete);
       for(int i = 0;  i <= level; i++){
         newNode.Forward[i] = update[i].Forward[i];
         update[i].Forward[i] = newNode;
@@ -76,8 +76,11 @@ internal class SkipList : IOrderedList{
   public bool TrySearch(int key, out string val){
     Node node = Search(key, out List<Node> _);
     node = node.Forward[0];
-    if(node is not null && node.key == key && !node.IsDelete){
+    if(node is not null && node.key == key){
       val = node.Val;
+      if(node.IsDelete){
+        val = null;
+      }
       return true;
     }
     val = null;
@@ -126,13 +129,13 @@ internal class Node{
   private readonly int level;
   public bool IsDelete {get;set;}
 
-  public Node(int key, string val, int level){
+  public Node(int key, string val, int level, bool del = false){
     this.key = key;
     Val = val;
     this.level = level;
     CurrentLevel = level;
     Forward = Enumerable.Repeat<Node>(null,level+1).ToList();
-    IsDelete = false;
+    IsDelete = del;
   }
 
   public void Reset(){

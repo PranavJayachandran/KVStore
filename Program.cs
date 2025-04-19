@@ -1,28 +1,16 @@
 ﻿using System.Text;
-using Core;
+using KeyValueStore;
 using Utils;
-
 public class NoSql{
   public static void Main(){
-    Memtable memtable = new Memtable(new RollingHash(1000));
-
-    SST.SetUpSSTFolder();
-    memtable.Add("two", "Haha");
-    for(int i=0;i<4;i++){
-      memtable.Add(GenerateRandomString(5), GenerateRandomString(10));
+    KVStore kv = new KVStore(new RollingHash(2000));
+    kv.Add("two", "Haha");
+    for(int i=0;i<10;i++){
+      kv.Add(GenerateRandomString(5), GenerateRandomString(10));
     }
-    memtable.Print();
-
-    var hash = new RollingHash(1000);
-    var p = memtable.GetAllData();
-    Console.WriteLine(p[0].Key);
-    Console.WriteLine(p[p.Count- 1].Key);
-    SST.WriteToSST(memtable.GetAllData());
-    if(SST.TryGetValue(hash.GetHash("two"), out string vali)){
-      Console.WriteLine("VALLLL :" + vali);
-    }
-    if(memtable.TryGet("one", out string val)){
-      Console.WriteLine(val);
+    kv.Remove("two");
+    if(kv.TryGetValue("two", out string val)){
+      Console.WriteLine("Found" + val);
     }
   }
   static string GenerateRandomString(int length)

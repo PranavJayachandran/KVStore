@@ -6,11 +6,17 @@ namespace Utils;
 
 //Format key value#IsDelete (followed by padding to get the 30 bytes size)
 //Every line should be 30 bytes in size. This is to improve search, if every line is of fixed length querying would be easier.
-public static class SST{
+public class SST{
+  private readonly IHash _hash;
   private static readonly int maxLevel = 3;
   private static readonly int[] fileSizePerLevel = [100, 200];
   private static readonly int entrySize = 30;
   private static readonly string baseDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"../../../SST"));
+
+  public SST(IHash hash){
+    _hash = hash;
+    SetUpSSTFolder();
+  }
 
   public static void SetUpSSTFolder(){
     string baseDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"../../../SST"));
@@ -27,11 +33,15 @@ public static class SST{
     }
   }
 
-  public static bool TryGetValue(int key, out string val){
+  public bool TryGetValue(string keyString, out string val){
+    int key = _hash.GetHash(keyString);
     int level = 1;
     while(level <= maxLevel){
       string filePath = GetLevelFilePath(level);
       if(FindPosFromFile(filePath, key, out val)){
+        //if the function returned true and val is null, means it was deleted.
+        if(val == null)
+          return false;
         return true;
       }
       level++;
@@ -40,7 +50,7 @@ public static class SST{
     return false;
   }
 
-  public static void WriteToSST(List<StoredData> data){
+  public void WriteToSST(List<StoredData> data){
     AddValueAtLevel(data, 1);
     Compaction();
   }
@@ -146,6 +156,7 @@ public static class SST{
     return index;
   }
 
+  //returns val if found and is not deleted, if deleted retunrs null but true
   private static bool FindPosFromFile(string filePath, int key, out string val){
     FileInfo fileInfo = new FileInfo(filePath);
     long size = fileInfo.Length;
@@ -164,13 +175,14 @@ public static class SST{
         high = mid - 1;
       } else{
         if(data.IsDelete){
-          break;
+          val = null;
+          return true;
         }
         val = data.Val;
         return true;
       }
     }
-    val = default;
+    val = null;
     return false;
   }
 

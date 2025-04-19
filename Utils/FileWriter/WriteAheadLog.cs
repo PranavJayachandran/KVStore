@@ -22,6 +22,10 @@ public class WriteAheadLog{
     return false;
   }
 
+  public void CleanLogFile(){
+    File.WriteAllText(filePath, "");
+  }
+
   public List<string> ReadAllLines(){
     return File.ReadAllLines(filePath)
       .Where(line => !string.IsNullOrWhiteSpace(line)).ToList();
