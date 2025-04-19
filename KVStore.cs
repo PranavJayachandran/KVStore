@@ -9,6 +9,7 @@ public class KVStore(IHash hash){
     _memtable.Add(key, val);
     if(_memtable.IsFull()){
       _sst.WriteToSST(_memtable.GetAllData());
+      Console.WriteLine(_memtable.GetAllData().Count);
       _memtable.CleanWAL();
       _memtable = new Memtable(hash);
     }

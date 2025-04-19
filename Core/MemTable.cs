@@ -7,7 +7,7 @@ public class Memtable{
   private readonly WriteAheadLog _wal;
 
   public Memtable(IHash hash){
-    _list = new SkipList(5, 500);
+    _list = new SkipList(5, 100);
     _hash = hash;
     _wal = new WriteAheadLog("wal.txt");
     if(!_wal.CreateLogFileIfNotExist()){
@@ -20,7 +20,6 @@ public class Memtable{
     if (!isRecovery){
       WriteLog(LogType.Insert, [key,val]);
     }
-    Print();
   }
 
   public bool TryGet(string key, out string val){

@@ -4,14 +4,18 @@ using Utils;
 public class NoSql{
   public static void Main(){
     KVStore kv = new KVStore(new RollingHash(2000));
-    kv.Add("two", "Haha");
-    for(int i=0;i<10;i++){
-      kv.Add(GenerateRandomString(5), GenerateRandomString(10));
-    }
-    kv.Remove("two");
-    if(kv.TryGetValue("two", out string val)){
-      Console.WriteLine("Found" + val);
-    }
+    kv.Add("one","one");
+    kv.Add("two","two");
+    kv.Add("three","three");
+    kv.Add("one1","one");
+    kv.Add("two2","two");
+    kv.Remove("three");
+    kv.Add("three2","three");
+
+    kv.Add("three3","three");
+    kv.Add("three4","three");
+    kv.Add("three5","three");
+    kv.Add("three6","three");
   }
   static string GenerateRandomString(int length)
   {

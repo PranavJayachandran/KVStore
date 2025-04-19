@@ -5,4 +5,5 @@
 - [x] Compaction
 - [x] Implement query accross memtable and sst 
 - [x] Propogate delete across SSTs
-- [ ] Bloom Filters for faster read
+- [x] Bloom Filters for faster read
+- [ ] Deleted entries can be removed from the last level

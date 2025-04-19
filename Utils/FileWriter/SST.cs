@@ -1,8 +1,8 @@
+using System.Collections;
 using System.Text;
 using Core;
 
 namespace Utils;
-
 
 //Format key value#IsDelete (followed by padding to get the 30 bytes size)
 //Every line should be 30 bytes in size. This is to improve search, if every line is of fixed length querying would be easier.
@@ -12,13 +12,14 @@ public class SST{
   private static readonly int[] fileSizePerLevel = [100, 200];
   private static readonly int entrySize = 30;
   private static readonly string baseDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"../../../SST"));
+  private readonly Dictionary<string, BloomFilter> bloomFilters = new Dictionary<string, BloomFilter>();
 
   public SST(IHash hash){
     _hash = hash;
     SetUpSSTFolder();
   }
 
-  public static void SetUpSSTFolder(){
+  public void SetUpSSTFolder(){
     string baseDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"../../../SST"));
 
     //Remove this when you add fault tolerance
@@ -38,7 +39,7 @@ public class SST{
     int level = 1;
     while(level <= maxLevel){
       string filePath = GetLevelFilePath(level);
-      if(FindPosFromFile(filePath, key, out val)){
+      if(CouldValBePresent(key, filePath) && FindPosFromFile(filePath, key, out val)){
         //if the function returned true and val is null, means it was deleted.
         if(val == null)
           return false;
@@ -55,7 +56,7 @@ public class SST{
     Compaction();
   }
 
-  private static void Compaction(){
+  private void Compaction(){
     //Start with level 1 
     int level = 1;
     while(level < maxLevel){
@@ -85,15 +86,32 @@ public class SST{
     }
   }
 
-  private static void AddValueAtLevel(List<StoredData> data, int level){
+  //Uses boolfilters to predict if the value could be present or no
+  private bool CouldValBePresent(int key, string filePath){
+    BloomFilter bloomFilter;
+    if(!bloomFilters.TryGetValue(filePath, out bloomFilter)){
+      throw new Exception($"No bloomfilter found for {filePath}");
+    }
+    return bloomFilter.Exists(key);
+  }
+
+
+  private void AddValueAtLevel(List<StoredData> data, int level){
     string filePath = GetLevelFilePath(level);
     List<string> fileData = ReadEntries(filePath);
     foreach(var val in data){
       int index = FindInsertionPosFromLines(fileData, val.Key, out bool IsMatch);
       if(IsMatch){
+        // If it is the last level and entry was soft deleted, remove it 
+        if(val.IsDelete){
+          fileData.RemoveAt(index);
+          continue;
+        }
         fileData[index] = FormatAndPaddString(val);
       } else{
-        fileData.Insert(index, FormatAndPaddString(val));
+        // If it is the last level and entry was soft deleted, dont add it
+        if(!val.IsDelete)
+          fileData.Insert(index, FormatAndPaddString(val));
       }
     }
     WriteEntries(filePath, fileData);
@@ -130,7 +148,16 @@ public class SST{
     return entries;
   }
 
-  private static void WriteEntries(string filePath, List<string>data){
+  //This function currently always does a full rewrite
+  private void  WriteEntries(string filePath, List<string>data){
+    BloomFilter bloomFilter;
+    if(!bloomFilters.TryGetValue(filePath, out bloomFilter)){
+      throw new Exception($"No bloom filter was initialised for {filePath}");
+    }
+    bloomFilter.Clear();
+    foreach(var entry in data){
+      bloomFilter.Add(GetStoredDataFromString(entry).Key);
+    }
     File.WriteAllText(filePath, string.Join(" | ",data));
   }
 
@@ -204,10 +231,12 @@ public class SST{
   }
 
   //If the level and file already exists nothing would happen
-  private static void AddNewLevel(){
+  private void AddNewLevel(){
     int currentLevelCount = Directory.GetDirectories(baseDir).Length;
     Directory.CreateDirectory(GetLevelFolderPath(currentLevelCount + 1));
-    using (File.Create(GetLevelFilePath(currentLevelCount + 1))){}
+    string filePath = GetLevelFilePath(currentLevelCount + 1);
+    using (File.Create(filePath)){}
+    bloomFilters.Add(filePath, new BloomFilter(20));
   }
 
   private static string GetLevelFolderPath(int level){
