@@ -11,7 +11,7 @@ public class Memtable{
     _hash = hash;
     _wal = new WriteAheadLog("wal.txt");
     if(!_wal.CreateLogFileIfNotExist()){
-      //RecoverUsingWal();
+      RecoverUsingWal();
     }
   }
 

@@ -7,15 +7,10 @@ public class NoSql{
     kv.Add("one","one");
     kv.Add("two","two");
     kv.Add("three","three");
-    kv.Add("one1","one");
-    kv.Add("two2","two");
-    kv.Remove("three");
-    kv.Add("three2","three");
 
-    kv.Add("three3","three");
-    kv.Add("three4","three");
-    kv.Add("three5","three");
-    kv.Add("three6","three");
+    if(kv.TryGetValue("one",out string val)){
+      Console.WriteLine(val);
+    }
   }
   static string GenerateRandomString(int length)
   {

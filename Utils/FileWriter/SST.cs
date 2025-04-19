@@ -103,15 +103,16 @@ public class SST{
       int index = FindInsertionPosFromLines(fileData, val.Key, out bool IsMatch);
       if(IsMatch){
         // If it is the last level and entry was soft deleted, remove it 
-        if(val.IsDelete){
+        fileData[index] = FormatAndPaddString(val);
+        if(level == maxLevel && val.IsDelete){
           fileData.RemoveAt(index);
           continue;
         }
-        fileData[index] = FormatAndPaddString(val);
       } else{
         // If it is the last level and entry was soft deleted, dont add it
-        if(!val.IsDelete)
-          fileData.Insert(index, FormatAndPaddString(val));
+        if(val.IsDelete && level == maxLevel)
+          continue;
+        fileData.Insert(index, FormatAndPaddString(val));
       }
     }
     WriteEntries(filePath, fileData);
@@ -134,7 +135,7 @@ public class SST{
     List<string> entries = [];
     using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read)){
       long totalEntries = stream.Length / entrySize ;
-      if(totalEntries > 0){
+      if(stream.Length > 0){
         totalEntries++;
       }
       for(long i = 0; i < totalEntries; i++){

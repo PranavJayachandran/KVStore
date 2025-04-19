@@ -3,20 +3,15 @@ using Core;
 
 namespace Utils ;
 
-internal class SkipList : IOrderedList{
-  private int maxLevel;
-  Node head;
+internal class SkipList(int maxLevel, int maxSize): IOrderedList{
+  private readonly int maxLevel = maxLevel;
+  private readonly Node head = new Node(-1, "HEAD", maxLevel-1);
   private static readonly Random rand = new Random();
   private long size;
-  private readonly int maxSize;
+  private readonly int maxSize = maxSize;
 
-  public SkipList(int maxLevel, int maxSize){
-    this.maxLevel = maxLevel;
-    this.maxSize = maxSize;
-    head = new Node(-1, "HEAD", maxLevel-1);
-  }
   public void Insert(int key, string val, bool IsDelete = false){
-    List<Node>update = null; 
+    List<Node>update; 
     Node node = Search(key,out update);
     if(node.Forward[0]?.key != key){
       int level = GenerateRandomLevel();
@@ -36,7 +31,7 @@ internal class SkipList : IOrderedList{
 
   //the delete should be soft delete. Append over update 
   public void Delete(int key){
-    Node node = Search(key, out List<Node> update);
+    Node node = Search(key, out _);
     node = node.Forward[0];
     if(node.key == key){
       node.IsDelete = true;
@@ -122,22 +117,13 @@ internal class SkipList : IOrderedList{
 
 
 
-internal class Node{
-  public readonly int key;
-  public string Val {get; set;}
-  public List<Node> Forward {get; set;}
-  public int CurrentLevel {get; set;}
+internal class Node(int key, string val, int level, bool del = false){
+  public readonly int key = key;
+  public string Val {get; set;} = val;
+  public List<Node> Forward {get; set;} = Enumerable.Repeat<Node>(null,level+1).ToList();
+  public int CurrentLevel {get; set;} = level;
   private readonly int level;
-  public bool IsDelete {get;set;}
-
-  public Node(int key, string val, int level, bool del = false){
-    this.key = key;
-    Val = val;
-    this.level = level;
-    CurrentLevel = level;
-    Forward = Enumerable.Repeat<Node>(null,level+1).ToList();
-    IsDelete = del;
-  }
+  public bool IsDelete {get;set;} = del;
 
   public void Reset(){
     CurrentLevel = level;

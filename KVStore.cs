@@ -9,7 +9,6 @@ public class KVStore(IHash hash){
     _memtable.Add(key, val);
     if(_memtable.IsFull()){
       _sst.WriteToSST(_memtable.GetAllData());
-      Console.WriteLine(_memtable.GetAllData().Count);
       _memtable.CleanWAL();
       _memtable = new Memtable(hash);
     }
@@ -19,6 +18,11 @@ public class KVStore(IHash hash){
       _memtable.Remove(key);
     } else if(_sst.TryGetValue(key, out _)){
       _memtable.Add(key, "tombstone", true);
+    }
+    if(_memtable.IsFull()){
+      _sst.WriteToSST(_memtable.GetAllData());
+      _memtable.CleanWAL();
+      _memtable = new Memtable(hash);
     }
   }
   public bool TryGetValue(string key, out string val){
