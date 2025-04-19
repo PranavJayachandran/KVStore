@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/pranj/code/c#/no-sql/no-sql.csproj",
-      "projectName": "no-sql",
-      "projectPath": "/home/pranj/code/c#/no-sql/no-sql.csproj",
+      "projectUniqueName": "/home/pranj/code/c#/kv-store/kv-store.csproj",
+      "projectName": "kv-store",
+      "projectPath": "/home/pranj/code/c#/kv-store/kv-store.csproj",
       "packagesPath": "/home/pranj/.nuget/packages/",
-      "outputPath": "/home/pranj/code/c#/no-sql/obj/",
+      "outputPath": "/home/pranj/code/c#/kv-store/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/pranj/.nuget/NuGet/NuGet.Config"

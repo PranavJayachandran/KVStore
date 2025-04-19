@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ywOMeUkqdEA=",
+  "dgSpecHash": "yY4wSvoSogs=",
   "success": true,
-  "projectFilePath": "/home/pranj/code/c#/no-sql/no-sql.csproj",
+  "projectFilePath": "/home/pranj/code/c#/kv-store/kv-store.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

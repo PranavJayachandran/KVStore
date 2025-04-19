@@ -11,7 +11,7 @@ public class SST{
   private static readonly int maxLevel = 3;
   private static readonly int[] fileSizePerLevel = [100, 200];
   private static readonly int entrySize = 30;
-  private static readonly string baseDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"../../../SST"));
+  private static readonly string baseDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"../../../sst"));
   private readonly Dictionary<string, BloomFilter> bloomFilters = new Dictionary<string, BloomFilter>();
 
   public SST(IHash hash){
@@ -20,7 +20,7 @@ public class SST{
   }
 
   public void SetUpSSTFolder(){
-    string baseDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"../../../SST"));
+    string baseDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"../../../sst"));
 
     //Remove this when you add fault tolerance
     //For ease remove recovery and let the system start from start

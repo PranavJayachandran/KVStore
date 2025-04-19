@@ -6,4 +6,4 @@
 - [x] Implement query accross memtable and sst 
 - [x] Propogate delete across SSTs
 - [x] Bloom Filters for faster read
-- [ ] Deleted entries can be removed from the last level
+- [x] Deleted entries can be removed from the last level
