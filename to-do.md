@@ -7,3 +7,5 @@
 - [x] Propogate delete across SSTs
 - [x] Bloom Filters for faster read
 - [x] Deleted entries can be removed from the last level
+- [ ] Make it async
+

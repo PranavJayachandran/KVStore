@@ -83,7 +83,6 @@ internal class SkipList(int maxLevel, int maxSize): IOrderedList{
   }
 
   public bool IsFull(){
-    return true;
     return size >= maxSize;
   }
 
